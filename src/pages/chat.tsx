@@ -1,6 +1,7 @@
 import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
+import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
 
 export default function Chat() {
     return(
@@ -13,7 +14,20 @@ export default function Chat() {
             </Head>
 
             <main className={`${chat.main} ${inter.className}`}>
+                <div className={chat.avatar}>
+                    <AvatarGroup style={{ flexDirection: 'column', justifyContent: 'center', paddingTop: '10px' }}>
+                        <Avatar bg='red.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                    </AvatarGroup>
+                </div>
+                <div className={chat.container}>
+                    <div className={chat.discussion}>
 
+                    </div>
+                </div>
             </main>
         </>
     )

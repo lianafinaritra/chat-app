@@ -5,6 +5,7 @@ import Image from 'next/image';
 import img from './logo.png';
 import {useForm} from "react-hook-form";
 import {inter} from "@/pages/_app";
+import {palette} from "@/theme/palette";
 
 export default function Login() {
 
@@ -56,7 +57,7 @@ export default function Login() {
                                 type='submit'
                                 isLoading={formState.isSubmitting}
                                 onClick={handleSubmit(onSubmit)}
-                                style={{ backgroundColor: '#AA77FF', fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
+                                style={{ backgroundColor: palette.primaryPurple, fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
                             >
                                 Se connecter
                             </Button>
@@ -64,7 +65,7 @@ export default function Login() {
                         </div>
                     </form>
                     <div className={loginStyle.presentation}>
-                        <Image src={img} alt="Description de l'image" style={{ width: '700px', height: '400px'}}/>
+                        <Image src={img} alt="Logo" style={{ width: '700px', height: '400px'}}/>
                     </div>
                 </div>
             </main>

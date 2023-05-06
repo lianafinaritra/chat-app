@@ -1,10 +1,36 @@
 
 .main {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
     height: 715px;
     background-image: url("../../splash.jpg");
     background-size: cover;
+}
+
+.avatar {
+    height: 100%;
+    width: 70px;
+    background-color: black;
+}
+
+.container {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(1px);
+    height: 100%;
+    width: calc(100% - 70px);
+    border-radius: 10px;
+    border-color: #AA77FF;
+    border-width: 3px;
+}
+
+.discussion {
+    width: 20%;
+    height: 100%;
+    border-right-width: 2px;
+    border-color: gray;
+}
+
+.message {
+
 }
