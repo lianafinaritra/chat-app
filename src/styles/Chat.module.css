@@ -1,0 +1,10 @@
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 715px;
+    background-image: url("../../splash.jpg");
+    background-size: cover;
+}
