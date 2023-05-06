@@ -1,7 +1,9 @@
 import Head from 'next/head'
-import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import loginStyle from '@/styles/LoginForm.module.css'
+import {Button} from "@chakra-ui/button";
+import Image from 'next/image';
+import img from './logo.png';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,26 +16,49 @@ export default function LoginForm() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <main className={`${styles.main} ${inter.className}`}>
-                <div className={styles.description}>
-                    <p>
-                        Get started by editing&nbsp;
-                        <code className={styles.code}>src/pages/index.tsx</code>
-                    </p>
-                </div>
+            <main className={`${loginStyle.main} ${inter.className}`}>
 
-                <div className={styles.center}>
-                    <Image
-                        className={styles.logo}
-                        src="/next.svg"
-                        alt="Next.js Logo"
-                        width={180}
-                        height={37}
-                        priority
-                    />
-                </div>
-
-                <div className={styles.grid}>
+                <div className={loginStyle.container}>
+                    <form className={loginStyle.form}>
+                        <div className={loginStyle.formContainer}>
+                        <div className="relative z-0 w-2/3 mx-auto mb-6 group">
+                            <input type="text" name="floating_first_name" id="floating_first_name"
+                                   className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                   placeholder=" " required/>
+                            <label htmlFor="floating_first_name"
+                                   className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">First
+                                name</label>
+                        </div>
+                            <div className="relative z-0 w-2/3 mx-auto mb-6 group">
+                            <input type="email" name="floating_email" id="floating_email"
+                                   className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                   placeholder=" " required/>
+                            <label htmlFor="floating_email"
+                                   className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email
+                                address</label>
+                        </div>
+                            <div className="relative z-0 w-2/3 mx-auto mb-6 group">
+                            <input type="password" name="floating_password" id="floating_password"
+                                   className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                                   placeholder=" " required/>
+                            <label htmlFor="floating_password"
+                                   className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Password</label>
+                        </div>
+                            <div className={loginStyle.submit}>
+                            <Button
+                                mt={1}
+                                colorScheme='teal'
+                                type='submit'
+                                style={{ backgroundColor: '#AA77FF', fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
+                            >
+                                Submit
+                            </Button>
+                            </div>
+                        </div>
+                    </form>
+                    <div className={loginStyle.presentation}>
+                        <Image src={img} alt="Description de l'image" style={{ width: '700px', height: '400px'}}/>
+                    </div>
                 </div>
             </main>
         </>
