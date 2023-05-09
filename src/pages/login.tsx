@@ -7,20 +7,23 @@ import {useForm} from "react-hook-form";
 import {inter} from "@/pages/_app";
 import {palette} from "@/theme/palette";
 import {useRouter} from "next/router";
+import Authentication from "@/pages/Authentication";
+import {useState} from "react";
 
 export default function Login() {
 
     const { register, handleSubmit, formState } = useForm();
     const router = useRouter();
+    const [login, setLogin] = useState(false);
 
     const onSubmit = (data: any) => {
         console.log(data);
         const jsonData = JSON.stringify(data);
         window.localStorage.setItem('myInformation', jsonData);
-        router.push('/chat').catch((error) => {
-            console.log("Error during redirection:", error);
-        });
+        setLogin(!login);
     };
+
+    Authentication(router, login);
 
     return (
         <>
