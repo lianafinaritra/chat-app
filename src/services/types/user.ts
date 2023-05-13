@@ -5,7 +5,7 @@ export interface CreateUser {
     name: string;
     bio?: string;
 }
-_
+
 export interface User {
     status: string;
     id: number;
