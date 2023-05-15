@@ -2,6 +2,7 @@ import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
 import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
+import reactotron from "@/reactotron.config";
 
 export default function Chat() {
     return(
