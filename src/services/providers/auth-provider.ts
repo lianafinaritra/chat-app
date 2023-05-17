@@ -1,18 +1,13 @@
-import { User, CreateUser } from '../types';
+import {User, CreateUser, LoginUser} from '../types';
+import {axiosRequest} from "@/services/providers/utils";
 
 export const authProvider = {
-    signUp: async (user: CreateUser) => publicRequest().post('/users', user),
-    signIn: async (user: User) => {
+    signIn: async (createUser: LoginUser) => {
       try {
-        const restUser: RestUser = (await publicRequest().post('/users/login', user)).data;
-        cache.accessToken(restUser.token);
-        return { redirection: '/board', data: restUser as DomainUser, authenticate: true };
+        const getUser: User = (await axiosRequest().post('/users/login', createUser)).data.user;
+          return { data: getUser, authenticate: true };
       } catch (error) {
-        const {
-          response: { status, data },
-        } = error as any;
-  
-        return { redirection: `/error?code=${status}`, data, authenticate: false };
+          return { data: null as any, authenticate: false };
       }
     },
   };

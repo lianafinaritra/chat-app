@@ -2,9 +2,29 @@ import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
 import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
-import reactotron from "@/reactotron.config";
+import { Text } from '@chakra-ui/react'
+import {useAuthStore} from "@/services/stores/auth-store";
+
+interface ChanelAvatarProps {
+    text: string;
+}
 
 export default function Chat() {
+    const { user } = useAuthStore();
+
+    const ChanelAvatar = ({ text }: ChanelAvatarProps) => {
+        return(
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
+                    <Avatar bg='teal.500' style={{marginBlock: '5px'}} />
+                </div>
+                <div style={{ width: '70%', display: 'flex', paddingLeft: 30 }}>
+                    <Text fontSize='sm' color='white'>{text}</Text>
+                </div>
+            </div>
+            )
+    }
+
     return(
         <>
             <Head>  
@@ -16,18 +36,19 @@ export default function Chat() {
 
             <main className={`${chat.main} ${inter.className}`}>
                 <div className={chat.avatar}>
-                    <AvatarGroup style={{ flexDirection: 'column', justifyContent: 'center', paddingTop: '10px' }}>
-                        <Avatar bg='red.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
-                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
-                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
-                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
-                        <Avatar bg='teal.500' style={{marginInline: 'auto', marginBlock: '5px'}} />
+                    <AvatarGroup style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '10px' }}>
+                        <ChanelAvatar text={'HEI Music Club'}/>
+                        <ChanelAvatar text={'Misy Sarany kely'}/>
+                        <ChanelAvatar text={'Misy Sarany be'}/>
+                        <ChanelAvatar text={'TC4'}/>
+                        <ChanelAvatar text={'Judi'}/>
                     </AvatarGroup>
                 </div>
                 <div className={chat.container}>
-                    <div className={chat.discussion}>
 
-                    </div>
+                </div>
+                <div className={chat.info}>
+
                 </div>
             </main>
         </>

@@ -11,5 +11,5 @@ type Action = {
 
 export const useAuthStore = create<Store & Action>()(set => ({
     user: null,
-    setUser: (user) => set(() => ({ user })),
+    setUser: (user) => set(({ user })),
 }));

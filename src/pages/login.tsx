@@ -3,27 +3,40 @@ import loginStyle from '@/styles/Login.module.css'
 import {Button} from "@chakra-ui/button";
 import Image from 'next/image';
 import img from './logo.png';
-import {useForm} from "react-hook-form";
+import {FieldValue, SubmitHandler, useForm} from "react-hook-form";
 import {inter} from "@/pages/_app";
 import {palette} from "@/theme/palette";
 import {useRouter} from "next/router";
-import Authentication from "@/pages/Authentication";
 import {useState} from "react";
+import {authProvider} from "@/services/providers/auth-provider";
+import {LoginUser} from "@/services/types";
+import { useAuthStore } from '../services/stores/auth-store';
 
 export default function Login() {
 
-    const { register, handleSubmit, formState } = useForm();
-    const router = useRouter();
-    const [login, setLogin] = useState(false);
-
-    const onSubmit = (data: any) => {
-        console.log(data);
-        const jsonData = JSON.stringify(data);
-        window.localStorage.setItem('myInformation', jsonData);
-        setLogin(!login);
+    const formDefaultValues: LoginUser = {
+        email: '',
+        password: '',
     };
 
-    Authentication(router, login);
+    const { register, handleSubmit, formState } = useForm<LoginUser>({
+        defaultValues: formDefaultValues
+    });
+    const { setUser } = useAuthStore();
+    const router = useRouter();
+
+    const onSubmit = (infos: LoginUser) => {
+        const login = async () => {
+            const { data, authenticate } = await authProvider.signIn(infos);
+            if (authenticate) {
+                setUser(data);
+                await router.push('/chat');
+            } else {
+                console.error('Failed to get User');
+            }
+        };
+        login();
+    };
 
     return (
         <>
