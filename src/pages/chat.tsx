@@ -11,6 +11,8 @@ import {MouseEventHandler, useRef} from "react";
 import {ChannelCreationModal} from "@/pages/components/channel-creation-modal";
 import {useChannelStore} from "@/services/stores/channel-store";
 import {channelProvider} from "@/services/providers/channel-provider";
+import {authProvider} from "@/services/providers/auth-provider";
+import {ChannelMemberModal} from "@/pages/components/channel-members-modal";
 
 interface ChanelAvatarProps {
     text: string;
@@ -18,17 +20,20 @@ interface ChanelAvatarProps {
 }
 
 export default function Chat() {
-    const { user } = useAuthStore();
+    const { user, setUsers } = useAuthStore();
     const { channel ,allChannels, setChannel } = useChannelStore();
 
-    const { isOpen, onOpen, onClose } = useDisclosure()
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: openMember, onOpen: onOpenMember, onClose: onCloseMember } = useDisclosure();
 
     const initialRef = useRef(null)
     const finalRef = useRef(null)
+    const initialMemberRef = useRef(null)
+    const finalMemberRef = useRef(null)
 
     const ChanelAvatar = ({ text, onClick }: ChanelAvatarProps) => {
         return(
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }} onClick={onClick}>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBlock: 5 }} onClick={onClick}>
                 <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
                     <Avatar bg='teal.500' style={{marginBlock: '5px'}} />
                 </div>
@@ -51,6 +56,19 @@ export default function Chat() {
         }
     };
 
+    const addNewMember = async () => {
+        if (user && user.token) {
+            const {data, check} = await authProvider.getAllUsers(user.token);
+            if (check) {
+                setUsers(data);
+                console.log('Opération réussi');
+            } else {
+                console.error('Failed to create channel');
+            }
+        }
+        onOpenMember();
+    }
+
     return(
         <>
             <Head>  
@@ -66,7 +84,7 @@ export default function Chat() {
                         {allChannels.map(channel => (
                             <ChanelAvatar key={channel.id} text={channel.name} onClick={() => showChannel(channel.id)}/>
                         ))}
-                        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBlock: 5 }}>
                             <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
                                 <Button colorScheme='teal' variant='solid' onClick={onOpen}>
                                     <Icon as={AddIcon} />
@@ -82,21 +100,29 @@ export default function Chat() {
                     </AvatarGroup>
                 </div>
                 <div className={chat.container}>
-                    <div style={{ width: '100%', height: 70, borderBottomWidth: 5, borderColor: palette.primaryPurple, display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                    <div style={{ width: '100%', height: 70, borderBottomWidth: '1px', borderColor: palette.primaryPurple, display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end'}}>
                         <div style={{ width: '85%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                             <Text fontSize='lg' color='white'>{channel?.name}</Text>
                         </div>
-                        <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }}>
+                        <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={() => addNewMember()}>
                             <AiOutlineUserAdd />
                         </Button>
+                        <ChannelMemberModal
+                            initialRef={initialRef}
+                            finalRef={finalRef}
+                            isOpen={openMember}
+                            onClose={onCloseMember}
+                        />
                     </div>
-                    <div style={{ backgroundColor: 'blue', width: '100%', flex: 1 }}>
+                    <div style={{ width: '100%', flex: 1 }}>
 
                     </div>
                 </div>
                 <div className={chat.info}>
-                    <Avatar bg='teal.500' style={{marginBlock: '5px'}} />
-                    <Text fontSize='sm' color='white'>{user?.name}</Text>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'center', paddingBlock: 10, marginTop: 100}}>
+                        <Avatar bg='teal.500' size="2xl"/>
+                    </div>
+                    <Text fontSize='2xl' color='white'>{user?.name}</Text>
                 </div>
             </main>
         </>

@@ -1,4 +1,4 @@
-import {User, CreateUser, LoginUser} from '../types';
+import {User, LoginUser} from '../types';
 import {request, requestToken} from "@/services/providers/utils";
 import {Channel} from "@/services/types/channel";
 

@@ -31,7 +31,7 @@ export const ChannelCreationModal = ({ initialRef, finalRef, isOpen, onClose }: 
         type: 'public',
         members: []
     };
-    const { register, handleSubmit, formState } = useForm<CreateChannel>({
+    const { register, handleSubmit, reset } = useForm<CreateChannel>({
         defaultValues: formDefaultValues
     });
     const validateType = (value: string) => {
@@ -46,7 +46,7 @@ export const ChannelCreationModal = ({ initialRef, finalRef, isOpen, onClose }: 
                 console.log('Channel ajouté avec succés');
                 const { data } = await channelProvider.getAllChannels( user?.token);
                 setChannels(data);
-                console.log(data);
+                reset();
             } else {
                 console.error('Failed to create channel');
             }
@@ -67,7 +67,7 @@ export const ChannelCreationModal = ({ initialRef, finalRef, isOpen, onClose }: 
                 <ModalHeader>Create your Channel</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody pb={6}>
-                    <div className="relative z-0 w-3/5 mx-auto mb-7 group">
+                    <div className="relative z-0 w-4/5 mx-auto mb-7 group">
                         <input type="email" id="floating_email"
                                className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-purple-600 focus:outline-none focus:ring-0 focus:border-purple-600 peer"
                                placeholder=" " required {...register('name')}/>
@@ -76,7 +76,7 @@ export const ChannelCreationModal = ({ initialRef, finalRef, isOpen, onClose }: 
                             Name
                         </label>
                     </div>
-                    <div className="relative z-0 w-3/5 mx-auto mb-7 group">
+                    <div className="relative z-0 w-4/5 mx-auto mb-7 group">
                         <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
                                htmlFor="grid-state">
                             Type
@@ -94,7 +94,7 @@ export const ChannelCreationModal = ({ initialRef, finalRef, isOpen, onClose }: 
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme='blue' mr={3} onClick={handleSubmit(onSubmit)}>
+                    <Button colorScheme='teal' mr={3} onClick={handleSubmit(onSubmit)}>
                         Save
                     </Button>
                     <Button onClick={onClose}>Cancel</Button>
