@@ -3,9 +3,9 @@ import {request, requestToken} from "@/services/providers/utils";
 import {Channel} from "@/services/types/channel";
 
 export const authProvider = {
-    signIn: async (createUser: LoginUser) => {
+    signIn: async (newUser: LoginUser) => {
       try {
-        const getUser: User = (await request().post('/users/login', createUser)).data.user;
+        const getUser: User = (await request().post('/users/login', newUser)).data.user;
           return { data: getUser, authenticate: true };
       } catch (error) {
           return { data: null as any, authenticate: false };

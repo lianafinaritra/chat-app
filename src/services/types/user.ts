@@ -11,6 +11,12 @@ export interface LoginUser {
     password: string;
 }
 
+export interface RestUser {
+    id: number;
+    email: string;
+    name: string;
+}
+
 export interface User {
     status: string;
     id: number;

@@ -2,8 +2,14 @@ import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
 import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
-import { Text } from '@chakra-ui/react'
+import {Text, Button, Icon, useDisclosure} from '@chakra-ui/react'
 import {useAuthStore} from "@/services/stores/auth-store";
+import {AddIcon} from "@chakra-ui/icons";
+import {palette} from "@/theme/palette";
+import { AiOutlineUserAdd } from 'react-icons/ai';
+import {useRef} from "react";
+import {ChannelCreationModal} from "@/pages/components/channel-creation-modal";
+import {useChannelStore} from "@/services/stores/channel-store";
 
 interface ChanelAvatarProps {
     text: string;
@@ -11,6 +17,12 @@ interface ChanelAvatarProps {
 
 export default function Chat() {
     const { user } = useAuthStore();
+    const { allChannels } = useChannelStore();
+
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    const initialRef = useRef(null)
+    const finalRef = useRef(null)
 
     const ChanelAvatar = ({ text }: ChanelAvatarProps) => {
         return(
@@ -37,18 +49,37 @@ export default function Chat() {
             <main className={`${chat.main} ${inter.className}`}>
                 <div className={chat.avatar}>
                     <AvatarGroup style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '10px' }}>
-                        <ChanelAvatar text={'HEI Music Club'}/>
-                        <ChanelAvatar text={'Misy Sarany kely'}/>
-                        <ChanelAvatar text={'Misy Sarany be'}/>
-                        <ChanelAvatar text={'TC4'}/>
-                        <ChanelAvatar text={'Judi'}/>
+                        {allChannels.map(channel => (
+                            <ChanelAvatar key={channel.id} text={channel.name} />
+                        ))}
+                        <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                            <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
+                                <Button colorScheme='teal' variant='solid' onClick={onOpen}>
+                                    <Icon as={AddIcon} />
+                                </Button>
+                                <ChannelCreationModal
+                                    initialRef={initialRef}
+                                    finalRef={finalRef}
+                                    isOpen={isOpen}
+                                    onClose={onClose}
+                                />
+                            </div>
+                        </div>
                     </AvatarGroup>
                 </div>
                 <div className={chat.container}>
+                    <div style={{ width: '100%', height: 70, borderBottomWidth: 5, borderColor: palette.primaryPurple, display: 'flex',alignItems: 'center'}}>
+                        <Button colorScheme='teal' variant='solid'>
+                            <AiOutlineUserAdd />
+                        </Button>
+                    </div>
+                    <div style={{ backgroundColor: 'blue', width: '100%', flex: 1 }}>
 
+                    </div>
                 </div>
                 <div className={chat.info}>
-
+                    <Avatar bg='teal.500' style={{marginBlock: '5px'}} />
+                    <Text fontSize='sm' color='white'>{user?.name}</Text>
                 </div>
             </main>
         </>

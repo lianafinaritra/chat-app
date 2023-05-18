@@ -23,6 +23,8 @@
     border-color: #AA77FF;
     border-width: 3px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
 }
 
 .discussion {

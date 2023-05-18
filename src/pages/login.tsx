@@ -3,11 +3,10 @@ import loginStyle from '@/styles/Login.module.css'
 import {Button} from "@chakra-ui/button";
 import Image from 'next/image';
 import img from './logo.png';
-import {FieldValue, SubmitHandler, useForm} from "react-hook-form";
+import {useForm} from "react-hook-form";
 import {inter} from "@/pages/_app";
 import {palette} from "@/theme/palette";
 import {useRouter} from "next/router";
-import {useState} from "react";
 import {authProvider} from "@/services/providers/auth-provider";
 import {LoginUser} from "@/services/types";
 import { useAuthStore } from '../services/stores/auth-store';
