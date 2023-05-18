@@ -7,26 +7,28 @@ import {useAuthStore} from "@/services/stores/auth-store";
 import {AddIcon} from "@chakra-ui/icons";
 import {palette} from "@/theme/palette";
 import { AiOutlineUserAdd } from 'react-icons/ai';
-import {useRef} from "react";
+import {MouseEventHandler, useRef} from "react";
 import {ChannelCreationModal} from "@/pages/components/channel-creation-modal";
 import {useChannelStore} from "@/services/stores/channel-store";
+import {channelProvider} from "@/services/providers/channel-provider";
 
 interface ChanelAvatarProps {
     text: string;
+    onClick: MouseEventHandler<HTMLDivElement>;
 }
 
 export default function Chat() {
     const { user } = useAuthStore();
-    const { allChannels } = useChannelStore();
+    const { channel ,allChannels, setChannel } = useChannelStore();
 
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     const initialRef = useRef(null)
     const finalRef = useRef(null)
 
-    const ChanelAvatar = ({ text }: ChanelAvatarProps) => {
+    const ChanelAvatar = ({ text, onClick }: ChanelAvatarProps) => {
         return(
-            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', width: '100%' }} onClick={onClick}>
                 <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
                     <Avatar bg='teal.500' style={{marginBlock: '5px'}} />
                 </div>
@@ -36,6 +38,18 @@ export default function Chat() {
             </div>
             )
     }
+
+    const showChannel = async (id: string) => {
+        if (user && user.token) {
+            const {data, check} = await channelProvider.getChannel(user?.token, id);
+            if (check) {
+                setChannel(data);
+                console.log('Opération réussi');
+            } else {
+                console.error('Failed to create channel');
+            }
+        }
+    };
 
     return(
         <>
@@ -50,7 +64,7 @@ export default function Chat() {
                 <div className={chat.avatar}>
                     <AvatarGroup style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '10px' }}>
                         {allChannels.map(channel => (
-                            <ChanelAvatar key={channel.id} text={channel.name} />
+                            <ChanelAvatar key={channel.id} text={channel.name} onClick={() => showChannel(channel.id)}/>
                         ))}
                         <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                             <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
@@ -68,8 +82,11 @@ export default function Chat() {
                     </AvatarGroup>
                 </div>
                 <div className={chat.container}>
-                    <div style={{ width: '100%', height: 70, borderBottomWidth: 5, borderColor: palette.primaryPurple, display: 'flex',alignItems: 'center'}}>
-                        <Button colorScheme='teal' variant='solid'>
+                    <div style={{ width: '100%', height: 70, borderBottomWidth: 5, borderColor: palette.primaryPurple, display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                        <div style={{ width: '85%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                            <Text fontSize='lg' color='white'>{channel?.name}</Text>
+                        </div>
+                        <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }}>
                             <AiOutlineUserAdd />
                         </Button>
                     </div>

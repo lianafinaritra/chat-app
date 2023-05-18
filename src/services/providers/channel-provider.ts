@@ -26,4 +26,12 @@ export const channelProvider = {
             return { data: null as any, check: false };
         }
     },
+    addMember: async (token: string, channelID: string, newMember: {members: string[]}) => {
+        try {
+            const member: string[] = (await requestToken(token).post('/channels/'+channelID+'/members', newMember)).data.userAdded;
+            return { data: member, check: true };
+        } catch (error) {
+            return { data: null as any, check: false };
+        }
+    }
 };
