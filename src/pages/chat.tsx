@@ -108,8 +108,8 @@ export default function Chat() {
                             <AiOutlineUserAdd />
                         </Button>
                         <ChannelMemberModal
-                            initialRef={initialRef}
-                            finalRef={finalRef}
+                            initialRef={initialMemberRef}
+                            finalRef={finalMemberRef}
                             isOpen={openMember}
                             onClose={onCloseMember}
                         />

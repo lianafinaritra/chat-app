@@ -9,7 +9,7 @@ import {palette} from "@/theme/palette";
 import {useRouter} from "next/router";
 import {authProvider} from "@/services/providers/auth-provider";
 import {LoginUser} from "@/services/types";
-import { useAuthStore } from '../services/stores/auth-store';
+import { useAuthStore } from '@/services/stores/auth-store';
 
 export default function Login() {
 

@@ -1,6 +1,5 @@
 import { User } from '../types';
 import { create } from 'zustand';
-import {Channel} from "@/services/types/channel";
 
 type Store = {
     user: User | null;

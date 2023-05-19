@@ -10,11 +10,8 @@ import {
 } from '@chakra-ui/react'
 import {FocusableElement} from "@chakra-ui/utils";
 import {RefObject} from "react";
-import {CreateChannel} from "@/services/types/channel";
 import {useForm} from "react-hook-form";
-import {channelProvider} from "@/services/providers/channel-provider";
 import {useAuthStore} from "@/services/stores/auth-store";
-import {useChannelStore} from "@/services/stores/channel-store";
 
 interface ChannelMemberProps {
     initialRef: RefObject<FocusableElement>;
