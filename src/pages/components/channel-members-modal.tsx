@@ -25,9 +25,8 @@ interface ChannelMemberProps {
 }
 
 export const ChannelMemberModal = ({ initialRef, finalRef, isOpen, onClose }: ChannelMemberProps) => {
-    const { user, setUsers, allUsers } = useAuthStore();
-    const { channel ,allChannels, setChannel } = useChannelStore();
-    const { allMessages ,setMessages } = useMessageStore();
+    const { user, allUsers } = useAuthStore();
+    const { channel } = useChannelStore();
 
     const formDefaultValues  = {
         members: []
@@ -42,6 +41,7 @@ export const ChannelMemberModal = ({ initialRef, finalRef, isOpen, onClose }: Ch
             if (user && user.token && channel) {
                 const {check} = await channelProvider.addMember(user.token, channel?.id, infos);
                 if (check) {
+                    reset();
                     console.log('Opération réussi');
                 } else {
                     console.error('Failed to add member');

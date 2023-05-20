@@ -24,6 +24,7 @@ interface ChanelAvatarProps {
 }
 
 interface CardMessageProps {
+    sender: string
     text: string;
 }
 
@@ -53,13 +54,16 @@ export default function Chat() {
             )
     }
 
-    const CardMessage= ({ text }: CardMessageProps) => {
+    const CardMessage= ({ text, sender }: CardMessageProps) => {
         return(
-            <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginRight: 20, marginBlock: 20 }}>
+            <>
+            <Text color='white' fontSize='sm' style={{ marginRight: 20, marginTop: 10 }}>{sender}</Text>
+            <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginRight: 20, marginBottom: 10}}>
                 <CardBody style={{ backgroundColor: 'transparent' }}>
                     <Text color='white'>{text}</Text>
                 </CardBody>
             </Card>
+            </>
         )
     }
 
@@ -199,7 +203,7 @@ export default function Chat() {
                         <div style={{ width: '100%', flex: 1, overflow: 'auto' }}>
                             <div style={{ height: '90%', display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}>
                                 {allMessages.map(message => (
-                                    <CardMessage key={message.id} text={message.content} />
+                                    <CardMessage key={message.id} text={message.content} sender={message.sender.name}/>
                                 ))}
                             </div>
                         </div>
