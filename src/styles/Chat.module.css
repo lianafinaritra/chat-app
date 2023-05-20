@@ -6,6 +6,7 @@
     height: 715px;
     background-image: url("../../splash.jpg");
     background-size: cover;
+    padding-block: 10px;
 }
 
 .avatar {

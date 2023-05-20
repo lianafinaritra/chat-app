@@ -12,6 +12,10 @@ import {FocusableElement} from "@chakra-ui/utils";
 import {RefObject} from "react";
 import {useForm} from "react-hook-form";
 import {useAuthStore} from "@/services/stores/auth-store";
+import {authProvider} from "@/services/providers/auth-provider";
+import {useChannelStore} from "@/services/stores/channel-store";
+import {useMessageStore} from "@/services/stores/message-store";
+import {channelProvider} from "@/services/providers/channel-provider";
 
 interface ChannelMemberProps {
     initialRef: RefObject<FocusableElement>;
@@ -21,17 +25,30 @@ interface ChannelMemberProps {
 }
 
 export const ChannelMemberModal = ({ initialRef, finalRef, isOpen, onClose }: ChannelMemberProps) => {
-    const { allUsers } = useAuthStore();
+    const { user, setUsers, allUsers } = useAuthStore();
+    const { channel ,allChannels, setChannel } = useChannelStore();
+    const { allMessages ,setMessages } = useMessageStore();
+
     const formDefaultValues  = {
         members: []
     };
+
     const { register, handleSubmit, reset } = useForm({
         defaultValues: formDefaultValues
     });
 
     const onSubmit = (infos: {members: string[]}) => {
-        console.log(infos);
-        reset();
+        const addNewMember = async () => {
+            if (user && user.token && channel) {
+                const {check} = await channelProvider.addMember(user.token, channel?.id, infos);
+                if (check) {
+                    console.log('Opération réussi');
+                } else {
+                    console.error('Failed to add member');
+                }
+            }
+        };
+        addNewMember();
     };
 
     return(
