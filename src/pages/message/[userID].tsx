@@ -10,72 +10,65 @@ import {
   DrawerHeader,
   DrawerOverlay, Icon, Input,
   Text,
-  useDisclosure
+  useDisclosure, useToast
 } from "@chakra-ui/react";
 import {MouseEventHandler, useEffect, useRef} from "react";
 import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
 import {useForm} from "react-hook-form";
-import {channelProvider} from "@/services/providers/channel-provider";
 import {messageProvider} from "@/services/providers/message-provider";
 import {authProvider} from "@/services/providers/auth-provider";
 import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
-import {AiOutlineMenu, AiOutlineReload, AiOutlineSend, AiOutlineUserAdd} from "react-icons/ai";
-import {router} from "next/client";
+import {AiOutlineMenu, AiOutlineReload, AiOutlineSend } from "react-icons/ai";
 import {TiArrowBack} from "react-icons/ti";
-import {HiOutlineUserGroup} from "react-icons/hi";
 import {BsInfoSquare} from "react-icons/bs";
 import {TbLogout} from "react-icons/tb";
-import {AddIcon} from "@chakra-ui/icons";
-import {ChannelCreationModal} from "@/pages/components/channel-creation-modal";
 import {palette} from "@/theme/palette";
-import {ChannelMemberModal} from "@/pages/components/channel-members-modal";
-import {Channel} from "@/services/types/channel";
-import {GetServerSideProps} from "next";
 import {useRouter} from "next/router";
-import {User} from "@/services/types";
+import {logout} from "@/pages/utils/logout";
+import {CardMessage, CardMessageSender} from "@/pages/components/card-message";
 interface ChanelAvatarProps {
   text: string;
   onClick: MouseEventHandler<HTMLDivElement>;
 }
 
-interface CardMessageProps {
-  sender: string
-  text: string;
-}
-
 const UserID = () => {
+  const toast = useToast();
   const router = useRouter();
   const { userID } = router.query;
   const id = Array.isArray(userID) ? userID[0] : userID;
   const { user, setUsers, allUsers } = useAuthStore();
-  const { channel , friend, setFriend } = useChannelStore();
+  const { friend, setFriend } = useChannelStore();
   const { allMessages ,setMessages } = useMessageStore();
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: openMember, onOpen: onOpenMember, onClose: onCloseMember } = useDisclosure();
   const { isOpen: openDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer } = useDisclosure()
 
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
-  const initialMemberRef = useRef(null)
-  const finalMemberRef = useRef(null)
+
+  const { push}= useRouter();
 
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
     const getAllMessages = async () => {
-      if (user && user.token && id) {
-        const {data, check} = await messageProvider.getAllMessagesByUser(user?.token, id.toString());
-        if (check) {
-          setMessages(data);
-          console.log('Opération réussi');
-        } else {
-          console.error('Failed to get Messages');
+      if (token) {
+        if (user && user.token && id) {
+          const {data, check} = await messageProvider.getAllMessagesByUser(user.token, id.toString());
+          if (check) {
+            setMessages(data);
+            const {data: users} = await authProvider.getAllUsers(user.token);
+            setUsers(users);
+          } else {
+          }
         }
+      } else {
+        push('/login');
       }
     };
     getAllMessages();
-  }, []);
+    const interval = setInterval(getAllMessages, 3000);
+    return () => clearInterval(interval);
+  }, [push]);
 
   const ChanelAvatar = ({ text, onClick }: ChanelAvatarProps) => {
     return(
@@ -90,85 +83,38 @@ const UserID = () => {
     )
   }
 
-  const CardMessageSender= ({ text, sender }: CardMessageProps) => {
-    return(
-        <>
-          <Text color='white' fontSize='sm' style={{ marginLeft: 1150, marginTop: 10 }}>{sender}</Text>
-          <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginLeft: 750, marginBottom: 10}}>
-            <CardBody style={{ backgroundColor: 'transparent' }}>
-              <Text color='white'>{text}</Text>
-            </CardBody>
-          </Card>
-        </>
-    )
-  }
-
-  const CardMessage= ({ text, sender }: CardMessageProps) => {
-    return(
-        <>
-          <Text color='white' fontSize='sm' style={{ marginLeft: 50, marginTop: 10 }}>{sender}</Text>
-          <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginLeft: 30, marginBottom: 10}}>
-            <CardBody style={{ backgroundColor: 'transparent' }}>
-              <Text color='white'>{text}</Text>
-            </CardBody>
-          </Card>
-        </>
-    )
-  }
-
   const formDefaultValues = {
-    content: ''
+    message: ''
   };
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: formDefaultValues
   });
 
-  const showUsers = async () => {
-    if (user && user.token) {
-      const {data, check} = await authProvider.getAllUsers(user.token);
-      if (check) {
-        setUsers(data);
-        console.log('Opération réussi');
-      } else {
-        console.error('Failed to get Users');
-      }
-    }
-    onOpenMember();
-  }
-
-  const getAllMessages = async () => {
-    if (user && user.token && friend) {
-      const {data, check} = await messageProvider.getAllMessagesByUser(user?.token, friend.id.toString());
-      if (check) {
-        setMessages(data);
-        console.log('Opération réussi');
-      } else {
-        console.error('Failed to get Messages');
-      }
-    }
-  }
-  const showFriend = async (newFriend: User) => {
-    if (newFriend && user && user.token) {
-      setFriend(newFriend);
-      const {data: messages} = await messageProvider.getAllMessagesByChannel(user.token, newFriend.id.toString());
-      setMessages(messages);
-      console.log('Opération réussi');
-    }
-  };
-
-  const onSubmit = (infos: {content: string}) => {
+  const onSubmit = (infos: {message: string}) => {
     const createMessage = async () => {
       if (user && user.token && friend) {
         console.log(infos)
-        const {check} = await messageProvider.createMessage(user.token, {...infos, channelId: null, recipientId: friend.id.toString()});
+        const {check} = await messageProvider.createMessage(user.token, {content: infos.message, channelId: null, recipientId: friend.id.toString()});
         if (check) {
           reset();
+          toast({
+            title: 'Ajouté avec success',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          })
           const {data} = await messageProvider.getAllMessagesByUser(user?.token, friend?.id.toString());
           setMessages(data);
           console.log(data);
         } else {
-          console.error('Failed to create channel');
+          toast({
+            title: 'Erreur',
+            description: 'Veuillez réessayez plus tard',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
         }
       }
     }
@@ -203,7 +149,7 @@ const UserID = () => {
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
-                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/chat')}>
+                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/1')}>
                           <TiArrowBack/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Messages de Groupes</Text>
@@ -215,7 +161,7 @@ const UserID = () => {
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>{"Informations d'utilisateurs"}</Text>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
-                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                        <Button colorScheme='teal' variant='solid' onClick={logout}>
                           <TbLogout/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
@@ -232,7 +178,7 @@ const UserID = () => {
               <Text color='white' width={300}>MESSAGES PRIVEES</Text>
             </div>
             <div style={{ marginLeft: 400 }}>
-              <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+              <Button colorScheme='teal' variant='solid' onClick={logout}>
                 <TbLogout/>
               </Button>
             </div>
@@ -240,41 +186,39 @@ const UserID = () => {
           <div className={chat.all}>
             <div className={chat.avatar}>
               <AvatarGroup style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '10px' }}>
-                {allUsers.map(friend => (
-                    <ChanelAvatar key={friend.id} text={friend.name} onClick={() => showFriend(friend)}/>
+                {allUsers.map(friendItem => (
+                    <ChanelAvatar key={friendItem.id} text={friendItem.name} onClick={async() => {
+                      setFriend(friendItem);
+                      await push('/message/'+friendItem.id);
+                    }}/>
                 ))}
                 <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBlock: 5 }}>
-                  <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
-                    <Button colorScheme='teal' variant='solid' onClick={() => showUsers()}>
-                      <AiOutlineReload/>
-                    </Button>
+                  <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                    <Text fontSize='lg' color='teal'>Amis</Text>
                   </div>
                 </div>
               </AvatarGroup>
             </div>
             <div className={chat.container}>
               <div style={{ width: '100%', height: 70, borderBottomWidth: '1px', borderColor: palette.primaryPurple, display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                <div style={{ width: '85%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                  <Text fontSize='lg' color='white'>{friend?.name}</Text>
+                <div style={{ width: '100%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                  <Text fontSize='2xl' color='white'>{friend?.name}</Text>
                 </div>
-                <Button colorScheme='teal' variant='solid' onClick={() => getAllMessages()}>
-                  <AiOutlineReload/>
-                </Button>
               </div>
               <div style={{ width: '100%', height: 590, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
                   <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     {allMessages?.slice().reverse().map(message => (
                         message.sender.id == user?.id ?
-                            <CardMessageSender key={message.id} text={message.content} sender={message.sender.name}/> :
-                            <CardMessage key={message.id} text={message.content} sender={message.sender.name}/>
+                            <CardMessageSender key={message.id} message={message}/> :
+                            <CardMessage key={message.id} message={message}/>
                     ))}
                   </div>
                 </div>
               </div>
               <div style={{ width: '100%',height: 70, display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <Input color='teal' type='email' focusBorderColor='teal' style={{ backgroundColor: 'white', marginLeft: 30 }} required {...register("content")}/>
-                <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={handleSubmit(onSubmit)}>
+                <Input color='teal' type='email' focusBorderColor='teal' style={{ backgroundColor: 'white', marginLeft: 30 }} required {...register("message")}/>
+                <Button className="sendMessageButton" colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={handleSubmit(onSubmit)}>
                   <AiOutlineSend />
                 </Button>
               </div>

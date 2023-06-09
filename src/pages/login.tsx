@@ -10,10 +10,10 @@ import {useRouter} from "next/router";
 import {authProvider} from "@/services/providers/auth-provider";
 import {LoginUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
-import {Text} from "@chakra-ui/react";
+import {Text, useToast} from "@chakra-ui/react";
 
 export default function Login() {
-
+    const toast = useToast();
     const formDefaultValues: LoginUser = {
         email: '',
         password: '',
@@ -30,10 +30,22 @@ export default function Login() {
             const { data, authenticate } = await authProvider.signIn(infos);
             if (authenticate) {
                 setUser(data);
+                toast({
+                    title: 'Authentifié',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })
                 localStorage.setItem('accessToken', data.token);
                 await router.push('/profile');
             } else {
-                console.error('Failed to get User');
+                toast({
+                    title: 'Erreur',
+                    description: 'Veuillez vérifié vos identifiants',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
             }
         };
         login();
@@ -72,6 +84,7 @@ export default function Login() {
                                 mt={1}
                                 colorScheme='teal'
                                 type='submit'
+                                className="loginButton"
                                 isLoading={formState.isSubmitting}
                                 onClick={handleSubmit(onSubmit)}
                                 style={{ backgroundColor: palette.primaryPurple, fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}

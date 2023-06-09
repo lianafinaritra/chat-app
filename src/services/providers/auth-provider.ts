@@ -29,7 +29,7 @@ export const authProvider = {
     },
     updateUser: async (token: string, infos: UpdateUser) => {
         try {
-            const user: User = (await requestToken(token).put('/user', infos)).data.users;
+            const user: User = (await requestToken(token).put('/user', infos)).data.user;
             return { data: user, check: true };
         } catch (error) {
             return { data: null as any, check: false };

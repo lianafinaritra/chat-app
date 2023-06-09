@@ -8,7 +8,7 @@ import {authProvider} from "@/services/providers/auth-provider";
 import {LoginUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
 import {Button} from "@chakra-ui/button";
-import {Card, CardBody, Text, Checkbox} from "@chakra-ui/react";
+import {Card, CardBody, Text, Checkbox, useToast} from "@chakra-ui/react";
 import {useChannelStore} from "@/services/stores/channel-store";
 import {CreateChannel} from "@/services/types/channel";
 import {channelProvider} from "@/services/providers/channel-provider";
@@ -16,7 +16,7 @@ import {useEffect, useState} from "react";
 import {TiArrowBack} from "react-icons/ti";
 
 export default function Create() {
-
+    const toast = useToast();
     const { user, allUsers, setUsers } = useAuthStore();
     const { setChannels } = useChannelStore();
 
@@ -45,7 +45,9 @@ export default function Create() {
     };
 
     useEffect(() => {
+        const token = localStorage.getItem('accessToken');
         const showUsers = async () => {
+            if (token) {
             if (user && user.token) {
                 const {data, check} = await authProvider.getAllUsers(user.token);
                 if (check) {
@@ -55,22 +57,36 @@ export default function Create() {
                     console.error('Failed to get Users');
                 }
             }
+            } else {
+                await push('/login');
+            }
         }
         showUsers();
-    }, []);
+    }, [push]);
 
     const onSubmit = (infos: CreateChannel) => {
         const submit = async () => {
             if (user && user.token) {
-                const { check } = await channelProvider.createChannel( user?.token ,{...infos, members: membersArray});
+                const { data: newChannel, check } = await channelProvider.createChannel( user?.token ,{...infos, members: membersArray});
                 if (check) {
-                    console.log('Channel ajouté avec succés');
+                    toast({
+                        title: 'Ajouté avec success',
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    })
                     const { data } = await channelProvider.getAllChannels( user?.token);
                     setChannels(data);
-                    await push('/profile');
+                    await push('/channel/'+newChannel.id);
                     reset();
                 } else {
-                    console.error('Failed to create channel');
+                    toast({
+                        title: 'Erreur',
+                        description: 'Veuillez réessayez plus tard',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
                 }
             }
         };
@@ -141,7 +157,7 @@ export default function Create() {
                         </div>
                         <input type="hidden" {...register('members')} value={JSON.stringify(formDefaultValues.members)} />
                         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginBlock: 5 }}>
-                        <Button style={{ backgroundColor: palette.primaryPurple }} mr={3} onClick={handleSubmit(onSubmit)}>
+                        <Button style={{ backgroundColor: palette.primaryPurple }} mr={3} className="createChannelButton" onClick={handleSubmit(onSubmit)}>
                             Enregistrer
                         </Button>
                         </div>

@@ -3,14 +3,12 @@ import {useChannelStore} from "@/services/stores/channel-store";
 import {useMessageStore} from "@/services/stores/message-store";
 import {
   Button,
-  Card,
-  CardBody,
   Drawer, DrawerBody,
   DrawerContent,
   DrawerHeader,
-  DrawerOverlay, Icon, Input,
+  DrawerOverlay, Input,
   Text,
-  useDisclosure
+  useDisclosure, useToast
 } from "@chakra-ui/react";
 import {MouseEventHandler, useEffect, useRef} from "react";
 import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
@@ -22,61 +20,58 @@ import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
 import {AiOutlineMenu, AiOutlineReload, AiOutlineSend, AiOutlineUserAdd} from "react-icons/ai";
-import {router} from "next/client";
 import {TiArrowBack} from "react-icons/ti";
 import {HiOutlineUserGroup} from "react-icons/hi";
 import {BsInfoSquare} from "react-icons/bs";
 import {TbLogout} from "react-icons/tb";
-import {AddIcon} from "@chakra-ui/icons";
-import {ChannelCreationModal} from "@/pages/components/channel-creation-modal";
 import {palette} from "@/theme/palette";
-import {ChannelMemberModal} from "@/pages/components/channel-members-modal";
-import {Channel} from "@/services/types/channel";
-import {GetServerSideProps} from "next";
 import {useRouter} from "next/router";
+import {logout} from "@/pages/utils/logout";
+import {Message} from "@/services/types/message";
+import {CardMessage, CardMessageSender} from "@/pages/components/card-message";
 interface ChanelAvatarProps {
   text: string;
   onClick: MouseEventHandler<HTMLDivElement>;
 }
 
-interface CardMessageProps {
-  sender: string
-  text: string;
-}
-
 const ChannelID = () => {
+  const toast = useToast();
   const router = useRouter();
   const { channelID } = router.query;
   const id = Array.isArray(channelID) ? channelID[0] : channelID;
   const { user, setUsers } = useAuthStore();
   const { channel ,allChannels, setChannel, setChannels } = useChannelStore();
   const { allMessages ,setMessages } = useMessageStore();
+  const { push}= useRouter();
 
   useEffect(() => {
+    const token = localStorage.getItem('accessToken');
     const showChannel = async () => {
-      if (user && user.token && id) {
-        const {data, check} = await channelProvider.getChannel(user?.token, parseInt(id, 10).toString());
-        if (check) {
-          setChannel(data);
-          const {data: messages} = await messageProvider.getAllMessagesByChannel(user?.token, data.id);
-          setMessages(messages);
-          console.log('Opération réussi');
-        } else {
-          console.error('Failed to get channel');
+      if (token) {
+        if (user && user.token && id) {
+          const {data, check} = await channelProvider.getChannel(user.token, id.toString());
+          if (check) {
+            setChannel(data);
+            const {data: messages} = await messageProvider.getAllMessagesByChannel(user.token, data.id);
+            setMessages(messages);
+            const {data: channels} = await channelProvider.getAllChannels(user.token);
+            setChannels(channels);
+            console.log('Opération réussi');
+          } else {
+            console.error('Failed to get channel');
+          }
         }
+      } else {
+        await push('/login');
       }
     };
     showChannel();
-  }, []);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: openMember, onOpen: onOpenMember, onClose: onCloseMember } = useDisclosure();
+    const interval = setInterval(showChannel, 3000);
+    return () => clearInterval(interval);
+  }, [push]);
+
   const { isOpen: openDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer } = useDisclosure()
-
-  const initialRef = useRef(null)
-  const finalRef = useRef(null)
-  const initialMemberRef = useRef(null)
-  const finalMemberRef = useRef(null)
 
   const ChanelAvatar = ({ text, onClick }: ChanelAvatarProps) => {
     return(
@@ -91,103 +86,38 @@ const ChannelID = () => {
     )
   }
 
-  const CardMessageSender= ({ text, sender }: CardMessageProps) => {
-    return(
-        <>
-          <Text color='white' fontSize='sm' style={{ marginLeft: 1150, marginTop: 10 }}>{sender}</Text>
-          <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginLeft: 750, marginBottom: 10}}>
-            <CardBody style={{ backgroundColor: 'transparent' }}>
-              <Text color='white'>{text}</Text>
-            </CardBody>
-          </Card>
-        </>
-    )
-  }
-
-  const CardMessage= ({ text, sender }: CardMessageProps) => {
-    return(
-        <>
-          <Text color='white' fontSize='sm' style={{ marginLeft: 50, marginTop: 10 }}>{sender}</Text>
-          <Card style={{ borderRadius: 10, borderWidth: 2, borderColor: 'red', backgroundColor: 'transparent', width: '40%', height: 50, justifyContent: 'center', marginLeft: 30, marginBottom: 10}}>
-            <CardBody style={{ backgroundColor: 'transparent' }}>
-              <Text color='white'>{text}</Text>
-            </CardBody>
-          </Card>
-        </>
-    )
-  }
-
   const formDefaultValues = {
-    content: ''
+    message: ''
   };
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: formDefaultValues
   });
 
-  const showChannel = async (id: string) => {
-    if (user && user.token) {
-      const {data, check} = await channelProvider.getChannel(user?.token, id);
-      if (check) {
-        setChannel(data);
-        const {data: messages} = await messageProvider.getAllMessagesByChannel(user?.token, data.id);
-        setMessages(messages);
-        console.log('Opération réussi');
-      } else {
-        console.error('Failed to get channel');
-      }
-    }
-  };
-
-  const showUsers = async () => {
-    if (user && user.token) {
-      const {data, check} = await authProvider.getAllUsers(user.token);
-      if (check) {
-        setUsers(data);
-        console.log('Opération réussi');
-      } else {
-        console.error('Failed to get Users');
-      }
-    }
-    onOpenMember();
-  }
-
-  const getAllChannels = async () => {
-    if (user && user.token) {
-      const { data, check } = await channelProvider.getAllChannels( user?.token);
-      if (check) {
-        setChannels(data);
-        console.log('Channel ajouté avec succés');
-        reset();
-      } else {
-        console.error('Failed to get All channels');
-      }
-    }
-  }
-
-  const getAllMessages = async () => {
-    if (user && user.token && channel) {
-      const {data, check} = await messageProvider.getAllMessagesByChannel(user?.token, channel?.id);
-      if (check) {
-        setMessages(data);
-        console.log('Opération réussi');
-      } else {
-        console.error('Failed to get Messages');
-      }
-    }
-  }
-  const onSubmit = (infos: {content: string}) => {
+  const onSubmit = (infos: {message: string}) => {
     const createMessage = async () => {
       if (user && user.token && channel) {
         console.log(infos)
-        const {check} = await messageProvider.createMessage(user.token, {...infos, channelId: channel.id, recipientId: null});
+        const {check} = await messageProvider.createMessage(user.token, {content: infos.message, channelId: channel.id, recipientId: null});
         if (check) {
           reset();
+          toast({
+            title: 'Ajouté avec success',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          })
           const {data} = await messageProvider.getAllMessagesByChannel(user?.token, channel?.id);
           setMessages(data);
           console.log(data);
         } else {
-          console.error('Failed to create channel');
+          toast({
+            title: 'Erreur',
+            description: 'Veuillez réessayez plus tard',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          })
         }
       }
     }
@@ -222,7 +152,7 @@ const ChannelID = () => {
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
-                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/chat-user')}>
+                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/message/1')}>
                           <HiOutlineUserGroup/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Message Privée</Text>
@@ -234,7 +164,7 @@ const ChannelID = () => {
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>{"Informations d'utilisateurs"}</Text>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
-                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                        <Button colorScheme='teal' variant='solid' onClick={logout}>
                           <TbLogout/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
@@ -249,7 +179,7 @@ const ChannelID = () => {
               <Text color='white' width={300}>MESSAGES DE GROUPES</Text>
             </div>
             <div style={{ marginLeft: 400 }}>
-              <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+              <Button colorScheme='teal' variant='solid' onClick={logout}>
                 <TbLogout/>
               </Button>
             </div>
@@ -258,24 +188,14 @@ const ChannelID = () => {
             <div className={chat.avatar}>
               <AvatarGroup style={{ flexDirection: 'column', alignItems: 'flex-start', paddingTop: '10px' }}>
                 {allChannels.map(channel => (
-                    <ChanelAvatar key={channel.id} text={channel.name} onClick={() => showChannel(channel.id)}/>
+                    <ChanelAvatar key={channel.id} text={channel.name} onClick={async () => {
+                      await push('/channel/'+channel.id);
+                    }
+                    }/>
                 ))}
                 <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBlock: 5 }}>
-                  <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
-                    <Button colorScheme='teal' variant='solid' onClick={onOpen}>
-                      <Icon as={AddIcon} />
-                    </Button>
-                    <ChannelCreationModal
-                        initialRef={initialRef}
-                        finalRef={finalRef}
-                        isOpen={isOpen}
-                        onClose={onClose}
-                    />
-                  </div>
-                  <div style={{ width: '30%', display: 'flex', justifyContent: 'center' }}>
-                    <Button colorScheme='teal' variant='solid' onClick={() => getAllChannels()}>
-                      <AiOutlineReload/>
-                    </Button>
+                  <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                      <Text fontSize='lg' color='teal'>Groupes</Text>
                   </div>
                 </div>
               </AvatarGroup>
@@ -283,35 +203,29 @@ const ChannelID = () => {
             <div className={chat.container}>
               <div style={{ width: '100%', height: 70, borderBottomWidth: '1px', borderColor: palette.primaryPurple, display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <div style={{ width: '85%', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                  <Text fontSize='lg' color='white'>{channel?.name}</Text>
+                  <Text fontSize='2xl' color='white'>{channel?.name}</Text>
                 </div>
-                <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={() => showUsers()}>
+                <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={async () => {
+                  await push('/channel/edit/'+channel?.id)
+                }
+                }>
                   <AiOutlineUserAdd />
                 </Button>
-                <Button colorScheme='teal' variant='solid' onClick={() => getAllMessages()}>
-                  <AiOutlineReload/>
-                </Button>
-                <ChannelMemberModal
-                    initialRef={initialMemberRef}
-                    finalRef={finalMemberRef}
-                    isOpen={openMember}
-                    onClose={onCloseMember}
-                />
               </div>
               <div style={{ width: '100%', height: 590, display: 'flex', flexDirection: 'column' }}>
                 <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
                   <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     {allMessages.slice().reverse().map(message => (
                         message.sender.id == user?.id ?
-                            <CardMessageSender key={message.id} text={message.content} sender={message.sender.name}/> :
-                            <CardMessage key={message.id} text={message.content} sender={message.sender.name}/>
+                            <CardMessageSender key={message.id} message={message}/> :
+                            <CardMessage key={message.id} message={message} />
                     ))}
                   </div>
                 </div>
               </div>
               <div style={{ width: '100%',height: 70, display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <Input color='teal' type='email' focusBorderColor='teal' style={{ backgroundColor: 'white', marginLeft: 30 }} required {...register("content")}/>
-                <Button colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={handleSubmit(onSubmit)}>
+                <Input color='teal' type='email' focusBorderColor='teal' style={{ backgroundColor: 'white', marginLeft: 30 }} required {...register("message")}/>
+                <Button className="sendMessageButton" colorScheme='teal' variant='solid' style={{ width: 70, marginInline: 30 }} onClick={handleSubmit(onSubmit)}>
                   <AiOutlineSend />
                 </Button>
               </div>

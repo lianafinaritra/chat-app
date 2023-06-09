@@ -10,9 +10,10 @@ import {useRouter} from "next/router";
 import {authProvider} from "@/services/providers/auth-provider";
 import {CreateUser, LoginUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
+import {Text, useToast} from "@chakra-ui/react";
 
 export default function SignUp() {
-
+    const toast = useToast();
     const formDefaultValues: CreateUser = {
         email: '',
         password: '',
@@ -31,10 +32,22 @@ export default function SignUp() {
             const { data, authenticate } = await authProvider.signUp(infos);
             if (authenticate) {
                 setUser(data);
+                toast({
+                    title: 'Authentifié',
+                    status: 'success',
+                    duration: 3000,
+                    isClosable: true,
+                })
                 localStorage.setItem('accessToken', data.token);
-                await router.push('/channel/create');
+                await router.push('/profile');
             } else {
-                console.error('Failed to get User');
+                toast({
+                    title: 'Erreur',
+                    description: 'Veuillez vérifié vos informations',
+                    status: 'error',
+                    duration: 3000,
+                    isClosable: true,
+                })
             }
         };
         signUp();
@@ -54,9 +67,9 @@ export default function SignUp() {
                     <form className={loginStyle.form}>
                         <div className={loginStyle.formContainer}>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
-                                <input type="text" id="floating_email"
+                                <input type="text" id="floating_name"
                                        className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-purple-600 focus:outline-none focus:ring-0 focus:border-purple-600 peer"
-                                       placeholder=" " required {...register("name")}/>
+                                       {...register("name")}/>
                                 <label htmlFor="floating_email"
                                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nom d'Utilisateur
                                 </label>
@@ -64,7 +77,7 @@ export default function SignUp() {
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
                             <input type="email" id="floating_email"
                                    className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-purple-600 focus:outline-none focus:ring-0 focus:border-purple-600 peer"
-                                   placeholder=" " required {...register("email")}/>
+                                   required {...register("email")}/>
                             <label htmlFor="floating_email"
                                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email
                                 </label>
@@ -86,6 +99,7 @@ export default function SignUp() {
                             </div>
                             <div className={loginStyle.submit}>
                             <Button
+                                className="registerButton"
                                 mt={1}
                                 colorScheme='teal'
                                 type='submit'
@@ -95,6 +109,9 @@ export default function SignUp() {
                             >
                                 Creer un compte
                             </Button>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
+                                    <Text fontSize='sm' color='white' onClick={() => router.push('/login')}>Se Connecter ?</Text>
+                                </div>
                             </div>
                         </div>
                     </form>

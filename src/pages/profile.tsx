@@ -8,15 +8,29 @@ import {useRouter} from "next/router";
 import {authProvider} from "@/services/providers/auth-provider";
 import {UpdateUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
-import {Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Text, useDisclosure} from "@chakra-ui/react";
+import {
+    Drawer,
+    DrawerBody,
+    DrawerContent,
+    DrawerHeader,
+    DrawerOverlay,
+    Text,
+    useDisclosure,
+    useToast
+} from "@chakra-ui/react";
 import {Avatar} from "@chakra-ui/avatar";
 import {TiArrowBack} from "react-icons/ti";
 import {AiOutlineMenu} from "react-icons/ai";
 import {HiOutlineUserGroup} from "react-icons/hi";
 import {TbLogout} from "react-icons/tb";
 import Link from 'next/link';
+import {logout} from "@/pages/utils/logout";
+import {useEffect} from "react";
+import {messageProvider} from "@/services/providers/message-provider";
+import {router} from "next/client";
 
 export default function Profile() {
+    const toast = useToast();
     const { user } = useAuthStore();
 
     const formDefaultValues: UpdateUser = {
@@ -32,14 +46,33 @@ export default function Profile() {
     const { setUser } = useAuthStore();
     const router = useRouter();
 
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+            if (!token) {
+                router.push('/login');
+            }
+    }, [router]);
+
     const onSubmit = (infos: UpdateUser) => {
         if (user && user.token) {
             const login = async () => {
                 const {data, check} = await authProvider.updateUser(user?.token, infos);
                 if (check) {
                     setUser(data);
+                    toast({
+                        title: 'Ajouté avec success',
+                        status: 'success',
+                        duration: 3000,
+                        isClosable: true,
+                    })
                 } else {
-                    console.error('Failed to update User');
+                    toast({
+                        title: 'Erreur',
+                        description: 'Veuillez réessayez plus tard',
+                        status: 'error',
+                        duration: 3000,
+                        isClosable: true,
+                    })
                 }
             };
             login();
@@ -88,7 +121,7 @@ export default function Profile() {
                                             <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Message Privée</Text>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
-                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                                            <Button colorScheme='teal' variant='solid' onClick={logout}>
                                                 <TbLogout/>
                                             </Button>
                                             <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
@@ -103,7 +136,7 @@ export default function Profile() {
                         <Text color='white'>PROFIL UTILISATEUR</Text>
                     </div>
                     <div style={{ marginLeft: 650 }}>
-                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                        <Button colorScheme='teal' variant='solid' onClick={logout}>
                             <TbLogout/>
                         </Button>
                     </div>
@@ -149,6 +182,7 @@ export default function Profile() {
                                     type='submit'
                                     isLoading={formState.isSubmitting}
                                     onClick={handleSubmit(onSubmit)}
+                                    className="updateProfileButton"
                                     style={{ backgroundColor: palette.primaryPurple, fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
                                 >
                                     Envoyer
