@@ -28,3 +28,7 @@
     height: 100%;
     align-items: center;
 }
+
+.formContainer {
+    margin-top: 180px;
+}

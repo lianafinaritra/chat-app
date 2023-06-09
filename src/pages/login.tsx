@@ -30,7 +30,8 @@ export default function Login() {
             const { data, authenticate } = await authProvider.signIn(infos);
             if (authenticate) {
                 setUser(data);
-                await router.push('/channel/create');
+                localStorage.setItem('accessToken', data.token);
+                await router.push('/profile');
             } else {
                 console.error('Failed to get User');
             }

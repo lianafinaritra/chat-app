@@ -29,6 +29,7 @@ import { Card,
 } from '@chakra-ui/react'
 import {useForm} from "react-hook-form";
 import {router} from "next/client";
+import {TiArrowBack} from "react-icons/ti";
 
 interface ChanelAvatarProps {
     text: string;
@@ -192,6 +193,12 @@ export default function Chat() {
                                     <DrawerHeader borderBottomWidth='1px'>Compte</DrawerHeader>
                                     <DrawerBody>
                                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/create')}>
+                                                <TiArrowBack/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
                                             <Button colorScheme='teal' variant='solid' onClick={() => router.push('/chat-user')}>
                                                 <HiOutlineUserGroup/>
                                             </Button>
@@ -203,15 +210,26 @@ export default function Chat() {
                                             </Button>
                                             <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>{"Informations d'utilisateurs"}</Text>
                                         </div>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                                                <TbLogout/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
+                                        </div>
                                     </DrawerBody>
                                 </DrawerContent>
                             </Drawer>
                         </div>
                         <Text color='white'>Mamaly.io</Text>
                     </div>
-                    <Button colorScheme='teal' variant='solid' onClick={onOpenDrawer}>
-                        <TbLogout/>
-                    </Button>
+                    <div style={{ marginLeft: 550 }}>
+                        <Text color='white' width={300}>MESSAGES DE GROUPES</Text>
+                    </div>
+                    <div style={{ marginLeft: 400 }}>
+                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                            <TbLogout/>
+                        </Button>
+                    </div>
                 </div>
                 <div className={chat.all}>
                     <div className={chat.avatar}>

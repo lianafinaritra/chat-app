@@ -9,12 +9,11 @@ import {LoginUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
 import {Button} from "@chakra-ui/button";
 import {Card, CardBody, Text, Checkbox} from "@chakra-ui/react";
-import Image from "next/image";
-import img from "@/pages/logo.png";
 import {useChannelStore} from "@/services/stores/channel-store";
 import {CreateChannel} from "@/services/types/channel";
 import {channelProvider} from "@/services/providers/channel-provider";
 import {useEffect, useState} from "react";
+import {TiArrowBack} from "react-icons/ti";
 
 export default function Create() {
 
@@ -88,6 +87,12 @@ export default function Create() {
             </Head>
 
             <main className={`${createChannelStyle.main} ${inter.className}`}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '10px'}}>
+                    <Button colorScheme='teal' variant='solid' onClick={() => push('/profile')}>
+                        <TiArrowBack/>
+                    </Button>
+                    <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Retour</Text>
+                </div>
                 <div className={createChannelStyle.container}>
                     <form className={createChannelStyle.form}>
                         <div style={{ width: '100%', display: 'flex', alignContent: 'center', marginBlock: 20 }}>

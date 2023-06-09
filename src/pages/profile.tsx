@@ -8,9 +8,13 @@ import {useRouter} from "next/router";
 import {authProvider} from "@/services/providers/auth-provider";
 import {UpdateUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
-import {Text} from "@chakra-ui/react";
+import {Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, Text, useDisclosure} from "@chakra-ui/react";
 import {Avatar} from "@chakra-ui/avatar";
 import {TiArrowBack} from "react-icons/ti";
+import {AiOutlineMenu} from "react-icons/ai";
+import {HiOutlineUserGroup} from "react-icons/hi";
+import {TbLogout} from "react-icons/tb";
+import Link from 'next/link';
 
 export default function Profile() {
     const { user } = useAuthStore();
@@ -42,6 +46,8 @@ export default function Profile() {
         }
     };
 
+    const { isOpen: openDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer } = useDisclosure()
+
     return (
         <>
             <Head>
@@ -52,10 +58,56 @@ export default function Profile() {
             </Head>
 
             <main className={`${profileStyle.main} ${inter.className}`}>
-                <Button style={{ marginBottom: '30px', backgroundColor: palette.primaryPurple }} variant='solid' onClick={() => router.push('/chat')}>
-                    <TiArrowBack/>
-                    <Text fontSize='l' color='white' style={{ marginLeft: '20px' }}>Message</Text>
-                </Button>
+                <div className={profileStyle.navbar}>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '200px', height: '100%', marginLeft: '20px' }}>
+                        <div style={{ width: '40%', display: 'flex', justifyContent: 'center' }}>
+                            <Button colorScheme='teal' variant='solid' onClick={onOpenDrawer}>
+                                <AiOutlineMenu/>
+                            </Button>
+                            <Drawer placement={'left'} onClose={onCloseDrawer} isOpen={openDrawer}>
+                                <DrawerOverlay />
+                                <DrawerContent>
+                                    <DrawerHeader borderBottomWidth='1px'>Messages de Groupes</DrawerHeader>
+                                    <DrawerBody>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/create')}>
+                                                <TiArrowBack/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/1')}>
+                                                <TiArrowBack/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Messages de Groupes</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/message/1')}>
+                                                <HiOutlineUserGroup/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Message Privée</Text>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                            <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                                                <TbLogout/>
+                                            </Button>
+                                            <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
+                                        </div>
+                                    </DrawerBody>
+                                </DrawerContent>
+                            </Drawer>
+                        </div>
+                        <Text color='white'>Mamaly.io</Text>
+                    </div>
+                    <div style={{ marginLeft: 450 }}>
+                        <Text color='white'>PROFIL UTILISATEUR</Text>
+                    </div>
+                    <div style={{ marginLeft: 650 }}>
+                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                            <TbLogout/>
+                        </Button>
+                    </div>
+                </div>
                 <div className={profileStyle.container}>
                     <form className={profileStyle.form}>
                         <div className={profileStyle.formContainer}>

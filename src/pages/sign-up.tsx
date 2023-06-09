@@ -31,6 +31,7 @@ export default function SignUp() {
             const { data, authenticate } = await authProvider.signUp(infos);
             if (authenticate) {
                 setUser(data);
+                localStorage.setItem('accessToken', data.token);
                 await router.push('/channel/create');
             } else {
                 console.error('Failed to get User');

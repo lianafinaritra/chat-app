@@ -29,6 +29,8 @@ import { Card,
 import {useForm} from "react-hook-form";
 import {router} from "next/client";
 import {User} from "@/services/types";
+import {TiArrowBack} from "react-icons/ti";
+import {BsInfoSquare} from "react-icons/bs";
 
 interface ChanelAvatarProps {
     text: string;
@@ -173,8 +175,29 @@ export default function ChatUser() {
                                     <DrawerContent>
                                         <DrawerHeader borderBottomWidth='1px'>Compte</DrawerHeader>
                                         <DrawerBody>
-                                            <div style={{width: '100%', display: 'flex', justifyContent: 'center', paddingBlock: 10, marginTop: 100}}>
-                                                <Avatar bg='teal.500' size="2xl"/>
+                                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                                <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/create')}>
+                                                    <TiArrowBack/>
+                                                </Button>
+                                                <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                                <Button colorScheme='teal' variant='solid' onClick={() => router.push('/chat')}>
+                                                    <TiArrowBack/>
+                                                </Button>
+                                                <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Messages de Groupes</Text>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                                <Button colorScheme='teal' variant='solid' onClick={() => router.push('/profile')}>
+                                                    <BsInfoSquare/>
+                                                </Button>
+                                                <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>{"Informations d'utilisateurs"}</Text>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
+                                                <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                                                    <TbLogout/>
+                                                </Button>
+                                                <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Déconnexion</Text>
                                             </div>
                                             <Text fontSize='2xl' color='black'>{user?.name}</Text>
                                             <Text fontSize='2xl' color='black'>{user?.email}</Text>
@@ -184,12 +207,14 @@ export default function ChatUser() {
                             </div>
                             <Text color='white'>Mamaly.io</Text>
                         </div>
-                    <Button colorScheme='teal' variant='solid' onClick={() => router.push('/chat')}>
-                        <HiOutlineUserGroup/>
-                    </Button>
-                    <Button colorScheme='teal' variant='solid' onClick={onOpenDrawer}>
-                        <TbLogout/>
-                    </Button>
+                    <div style={{ marginLeft: 550 }}>
+                        <Text color='white' width={300}>MESSAGES PRIVEES</Text>
+                    </div>
+                    <div style={{ marginLeft: 400 }}>
+                        <Button colorScheme='teal' variant='solid' onClick={() => router.push('/login')}>
+                            <TbLogout/>
+                        </Button>
+                    </div>
                 </div>
                 <div className={chat.all}>
                 <div className={chat.avatar}>
