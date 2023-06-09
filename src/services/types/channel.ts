@@ -13,5 +13,5 @@ export interface Channel {
 export interface CreateChannel {
     name: string;
     type: 'public' | 'private';
-    members: RestUser[];
+    members: string[];
 }

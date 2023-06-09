@@ -18,5 +18,13 @@ export const messageProvider = {
         } catch (error) {
             return { data: null as any, check: false };
         }
+    },
+    getAllMessagesByUser: async (token: string, userID: string) => {
+        try {
+            const allMessages: Message[] = (await requestToken(token).get('/messages/'+userID)).data.messages;
+            return { data: allMessages, check: true };
+        } catch (error) {
+            return { data: null as any, check: false };
+        }
     }
 };

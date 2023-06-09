@@ -13,6 +13,6 @@ export interface Message {
 
 export interface CreateMessage {
     content: string;
-    channelId: string;
+    channelId: string | null;
     recipientId: string | null;
 }

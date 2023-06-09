@@ -3,7 +3,14 @@ export interface CreateUser {
     email: string;
     password: string;
     name: string;
-    bio?: string;
+    bio: string | null;
+}
+
+export interface UpdateUser {
+    name: string;
+    oldPassword: string;
+    password: string;
+    bio: string | null;
 }
 
 export interface LoginUser {

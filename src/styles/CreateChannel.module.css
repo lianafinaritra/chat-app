@@ -28,3 +28,27 @@
     height: 100%;
     align-items: center;
 }
+
+.formContainer {
+    margin-top: 30%;
+    padding-block: 20px;
+    width: 100%;
+}
+
+.submit {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.presentation {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 60%;
+    height: 100%;
+    background-color: transparent;
+    border-radius: 50px;
+}
