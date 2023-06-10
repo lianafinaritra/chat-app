@@ -15,20 +15,17 @@ import {Avatar, AvatarGroup} from "@chakra-ui/avatar";
 import {useForm} from "react-hook-form";
 import {channelProvider} from "@/services/providers/channel-provider";
 import {messageProvider} from "@/services/providers/message-provider";
-import {authProvider} from "@/services/providers/auth-provider";
 import Head from "next/head";
 import chat from "@/styles/Chat.module.css";
 import {inter} from "@/pages/_app";
-import {AiOutlineMenu, AiOutlineReload, AiOutlineSend, AiOutlineUserAdd} from "react-icons/ai";
-import {TiArrowBack} from "react-icons/ti";
-import {HiOutlineUserGroup} from "react-icons/hi";
+import {AiOutlineMenu, AiOutlineMessage, AiOutlineSend, AiOutlineUserAdd} from "react-icons/ai";
 import {BsInfoSquare} from "react-icons/bs";
 import {TbLogout} from "react-icons/tb";
 import {palette} from "@/theme/palette";
 import {useRouter} from "next/router";
 import {logout} from "@/pages/utils/logout";
-import {Message} from "@/services/types/message";
 import {CardMessage, CardMessageSender} from "@/pages/components/card-message";
+import {BiAddToQueue} from "react-icons/bi";
 interface ChanelAvatarProps {
   text: string;
   onClick: MouseEventHandler<HTMLDivElement>;
@@ -147,13 +144,13 @@ const ChannelID = () => {
                     <DrawerBody>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
                         <Button colorScheme='teal' variant='solid' onClick={() => router.push('/channel/create')}>
-                          <TiArrowBack/>
+                          <BiAddToQueue/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Créer un nouveau groupe</Text>
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBlock: '20px'}}>
                         <Button colorScheme='teal' variant='solid' onClick={() => router.push('/message/1')}>
-                          <HiOutlineUserGroup/>
+                          <AiOutlineMessage/>
                         </Button>
                         <Text fontSize='l' color='teal' style={{ marginLeft: '20px' }}>Message Privée</Text>
                       </div>
