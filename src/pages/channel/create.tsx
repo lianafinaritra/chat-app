@@ -14,6 +14,8 @@ import {CreateChannel} from "@/services/types/channel";
 import {channelProvider} from "@/services/providers/channel-provider";
 import {useEffect, useState} from "react";
 import {TiArrowBack} from "react-icons/ti";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
 
 export default function Create() {
     const toast = useToast();
@@ -27,8 +29,14 @@ export default function Create() {
         type: 'public',
         members: []
     };
-    const { register, handleSubmit, reset } = useForm<CreateChannel>({
-        defaultValues: formDefaultValues
+
+    const validationSchema = yup.object().shape({
+        name: yup.string().required('Ce champ est requis'),
+    });
+
+    const { register, handleSubmit, reset, formState: {errors} } = useForm<CreateChannel>({
+        defaultValues: formDefaultValues,
+        resolver: yupResolver(validationSchema)
     });
     const validateType = (value: string) => {
         return value === 'public' || value === 'private' || 'Le champ "type" est requis';
@@ -122,6 +130,7 @@ export default function Create() {
                                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                                 Nom de la discussion
                             </label>
+                            {errors.name && <Text fontSize='sm' color='red'>{errors.name?.message}</Text>}
                         </div>
                         <div className="relative z-0 w-4/5 mx-auto mb-7 group">
                             <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"

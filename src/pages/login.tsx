@@ -11,6 +11,8 @@ import {authProvider} from "@/services/providers/auth-provider";
 import {LoginUser} from "@/services/types";
 import { useAuthStore } from '@/services/stores/auth-store';
 import {Text, useToast} from "@chakra-ui/react";
+import * as yup from 'yup';
+import {yupResolver} from "@hookform/resolvers/yup";
 
 export default function Login() {
     const toast = useToast();
@@ -19,8 +21,13 @@ export default function Login() {
         password: '',
     };
 
-    const { register, handleSubmit, formState } = useForm<LoginUser>({
-        defaultValues: formDefaultValues
+    const validationSchema = yup.object().shape({
+        email: yup.string().email('Adresse Email Invalide').required('Ce champ est requis'),
+    });
+
+    const { register, handleSubmit, formState: {errors} } = useForm<LoginUser>({
+        defaultValues: formDefaultValues,
+        resolver: yupResolver(validationSchema)
     });
     const { setUser } = useAuthStore();
     const router = useRouter();
@@ -71,6 +78,7 @@ export default function Login() {
                             <label htmlFor="floating_email"
                                    className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email
                                 </label>
+                                {errors.email && <Text fontSize='sm' color='red'>{errors.email?.message}</Text>}
                         </div>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
                             <input type="password" id="floating_password"
@@ -85,7 +93,6 @@ export default function Login() {
                                 colorScheme='teal'
                                 type='submit'
                                 className="loginButton"
-                                isLoading={formState.isSubmitting}
                                 onClick={handleSubmit(onSubmit)}
                                 style={{ backgroundColor: palette.primaryPurple, fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
                             >

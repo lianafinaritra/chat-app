@@ -28,6 +28,8 @@ import {logout} from "@/pages/utils/logout";
 import {useEffect} from "react";
 import {messageProvider} from "@/services/providers/message-provider";
 import {router} from "next/client";
+import * as yup from "yup";
+import {yupResolver} from "@hookform/resolvers/yup";
 
 export default function Profile() {
     const toast = useToast();
@@ -40,8 +42,15 @@ export default function Profile() {
         bio: ''
     };
 
-    const { register, handleSubmit, formState } = useForm<UpdateUser>({
-        defaultValues: formDefaultValues
+    const validationSchema = yup.object().shape({
+        name: yup.string().required('Ce champ est requis'),
+        oldPassword: yup.string().required('Ce champ est requis'),
+        password: yup.string().required('Ce champ est requis'),
+    });
+
+    const { register, handleSubmit, formState: {errors} } = useForm<UpdateUser>({
+        defaultValues: formDefaultValues,
+        resolver: yupResolver(validationSchema)
     });
     const { setUser } = useAuthStore();
     const router = useRouter();
@@ -145,12 +154,13 @@ export default function Profile() {
                     <form className={profileStyle.form}>
                         <div className={profileStyle.formContainer}>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
-                                <input type="email" id="floating_email"
+                                <input type="text" id="floating_name"
                                        className="block py-2.5 px-0 w-full text-sm text-gray-400 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-purple-600 focus:outline-none focus:ring-0 focus:border-purple-600 peer"
                                        placeholder=" " required {...register("name")}/>
-                                <label htmlFor="floating_email"
+                                <label htmlFor="floating_name"
                                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nom
                                 </label>
+                                {errors.name && <Text fontSize='sm' color='red'>{errors.name?.message}</Text>}
                             </div>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
                                 <input type="password" id="floating_password"
@@ -158,6 +168,7 @@ export default function Profile() {
                                        placeholder=" " required {...register("oldPassword")}/>
                                 <label htmlFor="floating_password"
                                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Ancien mot de passe</label>
+                                {errors.oldPassword && <Text fontSize='sm' color='red'>{errors.oldPassword?.message}</Text>}
                             </div>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
                                 <input type="password" id="floating_email"
@@ -166,6 +177,7 @@ export default function Profile() {
                                 <label htmlFor="floating_email"
                                        className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-purple-600 peer-focus:dark:text-purple-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Nouveau mot de passe
                                 </label>
+                                {errors.password && <Text fontSize='sm' color='red'>{errors.password?.message}</Text>}
                             </div>
                             <div className="relative z-0 w-3/5 mx-auto mb-7 group">
                                 <input type="email" id="floating_email"
@@ -180,7 +192,6 @@ export default function Profile() {
                                     mt={1}
                                     colorScheme='teal'
                                     type='submit'
-                                    isLoading={formState.isSubmitting}
                                     onClick={handleSubmit(onSubmit)}
                                     className="updateProfileButton"
                                     style={{ backgroundColor: palette.primaryPurple, fontSize: '14px', color: 'white', marginBlock: 'auto', width: '40%', borderRadius: '50px', marginLeft: '30%', boxShadow: "0 0 7px 7px rgba(170, 119, 255, 0.5)"}}
